@@ -9,8 +9,10 @@ import {TransceiverStructs} from
 import {NttManager} from "@wormhole-foundation/native_token_transfer/NttManager/NttManager.sol";
 import {INttManager} from "@wormhole-foundation/native_token_transfer/interfaces/INttManager.sol";
 import {IManagerBase} from "@wormhole-foundation/native_token_transfer/interfaces/IManagerBase.sol";
+
+import {DummyTokenMintAndBurn} from
+    "@wormhole-foundation/native_token_transfer/mocks/DummyToken.sol";
 import {ERC1967Proxy} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {WstEthL2Token} from "src/token/WstEthL2Token.sol";
 
 import "forge-std/console.sol";
 import "forge-std/Test.sol";
@@ -28,12 +30,12 @@ contract AxelarTransceiverEndToEnd is Test {
     IAxelarGateway gateway;
     IAxelarGasService gasService;
     NttManager sourceNttmanager;
-    WstEthL2Token sourceToken;
+    DummyTokenMintAndBurn sourceToken;
     uint16 sourceChainId;
 
     AxelarTransceiver recipientTransceiver;
     NttManager recipientNttManager;
-    WstEthL2Token recipientToken;
+    DummyTokenMintAndBurn recipientToken;
     uint16 recipientChainId;
 
     function setUp() public {
@@ -41,19 +43,7 @@ contract AxelarTransceiverEndToEnd is Test {
         gasService = IAxelarGasService(address(new MockAxelarGasService()));
         // Setup Source Infrastructure
         sourceChainId = 1;
-        address tokenImplementaion = address(new WstEthL2Token());
-        sourceToken = WstEthL2Token(
-            address(
-                new ERC1967Proxy(
-                    tokenImplementaion,
-                    abi.encodeWithSelector(
-                        WstEthL2Token.initialize.selector, "Source Token", "ST", OWNER
-                    )
-                )
-            )
-        );
-        vm.prank(OWNER);
-        sourceToken.setMinter(OWNER);
+        sourceToken = new DummyTokenMintAndBurn();
         address sourceManagerImplementation = address(
             new NttManager(
                 address(sourceToken),
@@ -77,18 +67,7 @@ contract AxelarTransceiverEndToEnd is Test {
 
         // Setup Recipient Infrastructure
         recipientChainId = 2;
-        recipientToken = WstEthL2Token(
-            address(
-                new ERC1967Proxy(
-                    tokenImplementaion,
-                    abi.encodeWithSelector(
-                        WstEthL2Token.initialize.selector, "Source Token", "ST", OWNER
-                    )
-                )
-            )
-        );
-        vm.prank(OWNER);
-        recipientToken.setMinter(OWNER);
+        recipientToken = new DummyTokenMintAndBurn();
         address recipientManagerImplementation = address(
             new NttManager(
                 address(recipientToken),

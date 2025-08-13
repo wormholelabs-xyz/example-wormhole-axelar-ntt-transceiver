@@ -4,6 +4,12 @@ pragma solidity >=0.8.0 <0.9.0;
 import {ITransceiver} from "@wormhole-foundation/native_token_transfer/interfaces/ITransceiver.sol";
 
 interface IAxelarTransceiver is ITransceiver {
+    /// @notice The instruction for the WormholeTransceiver contract
+    ///         to skip delivery via the relayer.
+    struct AxelarTransceiverInstruction {
+        uint256 estimatedMsgValue;
+    }
+
     /// @notice Chain is not supported.
     /// @param chainId The wormhole chainId.
     /// @param sourceChain The source chain axelar name.
@@ -54,4 +60,19 @@ interface IAxelarTransceiver is ITransceiver {
         string calldata chainName,
         string calldata transceiverAddress
     ) external;
+
+    /// @notice Parses the encoded instruction and returns the instruction struct.
+    ///         This instruction is specific to the AxelarTransceiver contract.
+    /// @param encoded The encoded instruction.
+    /// @return instruction The parsed `AxelarTransceiverInstruction`.
+    function parseAxelarTransceiverInstruction(
+        bytes memory encoded
+    ) external pure returns (AxelarTransceiverInstruction memory instruction);
+
+    /// @notice Encodes the `AxelarTransceiverInstruction` into a byte array.
+    /// @param instruction The `AxelarTransceiverInstruction` to encode.
+    /// @return encoded The encoded instruction.
+    function encodeAxelarTransceiverInstruction(
+        AxelarTransceiverInstruction memory instruction
+    ) external pure returns (bytes memory);
 }

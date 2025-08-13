@@ -2,6 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "wormhole-solidity-sdk/Utils.sol";
+import "wormhole-solidity-sdk/libraries/BytesParsing.sol";
 
 import {TransceiverStructs} from
     "@wormhole-foundation/native_token_transfer/libraries/TransceiverStructs.sol";
@@ -21,9 +22,11 @@ import {ITransceiver} from "@wormhole-foundation/native_token_transfer/interface
 import {IAxelarTransceiver} from "./interfaces/IAxelarTransceiver.sol";
 
 contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, Transceiver {
+    using BytesParsing for bytes;
+
     IAxelarGasService public immutable gasService;
 
-    string public constant AXELAR_TRANSCEIVER_VERSION = "1.1.0";
+    string public constant AXELAR_TRANSCEIVER_VERSION = "2.0.0";
 
     // These mappings are used to convert chainId and chainName between Wormhole and Axelar formats.
     struct AxelarTransceiverStorage {
@@ -36,9 +39,6 @@ contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, Transceiv
 
     bytes32 internal constant AXELAR_TRANSCEIVER_STORAGE_SLOT =
         0x6d72a7741b755e11bdb1cef6ed3f290bbe196e69da228a3ae322e5bc37ea7600;
-
-    // TODO: update this based on tests
-    uint256 internal constant DESTINATION_EXECUTION_GAS_LIMIT = 200000;
 
     constructor(
         address _gateway,
@@ -97,25 +97,35 @@ contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, Transceiv
         emit AxelarChainIdSet(chainId, chainName, transceiverAddress);
     }
 
+    /// @inheritdoc IAxelarTransceiver
+    function parseAxelarTransceiverInstruction(
+        bytes memory encoded
+    ) public pure returns (AxelarTransceiverInstruction memory instruction) {
+        uint256 offset = 0;
+        (instruction.estimatedMsgValue, offset) = encoded.asUint256Unchecked(offset);
+        encoded.checkLength(offset);
+    }
+
+    /// @inheritdoc IAxelarTransceiver
+    function encodeAxelarTransceiverInstruction(
+        AxelarTransceiverInstruction memory instruction
+    ) public pure returns (bytes memory) {
+        return abi.encodePacked(instruction.estimatedMsgValue);
+    }
+
     /// @notice Fetch the delivery price for a given recipient chain transfer.
-    /// @param recipientChainId The Wormhole chain ID of the target chain.
-    /// param instruction An additional Instruction provided by the Transceiver to be
+    /// param recipientChainId The Wormhole chain ID of the target chain.
+    /// @param instruction An additional Instruction provided by the Transceiver to be
     ///        executed on the recipient chain.
     /// @return deliveryPrice The cost of delivering a message to the recipient chain,
     ///         in this chain's native token.
     function _quoteDeliveryPrice(
-        uint16 recipientChainId,
-        TransceiverStructs.TransceiverInstruction memory /*instruction*/
+        uint16, /*recipientChainId*/
+        TransceiverStructs.TransceiverInstruction memory instruction
     ) internal view virtual override returns (uint256) {
-        // Use the gas estimation from gas service
-        AxelarTransceiverStorage storage slot = _storage();
-        return gasService.estimateGasFee(
-            slot.idToAxelarChainId[recipientChainId],
-            slot.idToTransceiverAddress[recipientChainId],
-            bytes(""),
-            DESTINATION_EXECUTION_GAS_LIMIT,
-            bytes("")
-        );
+        AxelarTransceiverInstruction memory axIns =
+            parseAxelarTransceiverInstruction(instruction.payload);
+        return axIns.estimatedMsgValue;
     }
 
     /// @dev Send a message to another chain.
