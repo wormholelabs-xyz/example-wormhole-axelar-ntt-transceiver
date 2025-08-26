@@ -19,9 +19,9 @@ import {
 import {ITransceiver} from "@wormhole-foundation/native_token_transfer/interfaces/ITransceiver.sol";
 
 import {IAxelarTransceiver} from "./interfaces/IAxelarTransceiver.sol";
-import {TokenlessTransceiver} from "./TokenlessTransceiver.sol";
+import {Transceiver} from "@wormhole-foundation/native_token_transfer/Transceiver/Transceiver.sol";
 
-contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, TokenlessTransceiver {
+contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, Transceiver {
     using BytesParsing for bytes;
 
     IAxelarGasService public immutable gasService;
@@ -44,7 +44,7 @@ contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, Tokenless
         address _gateway,
         address _gasService,
         address _manager
-    ) AxelarGMPExecutable(_gateway) TokenlessTransceiver(_manager) {
+    ) AxelarGMPExecutable(_gateway) Transceiver(_manager) {
         gasService = IAxelarGasService(_gasService);
     }
 
@@ -53,7 +53,7 @@ contract AxelarTransceiver is IAxelarTransceiver, AxelarGMPExecutable, Tokenless
         external
         view
         virtual
-        override(TokenlessTransceiver, ITransceiver)
+        override(Transceiver, ITransceiver)
         returns (string memory)
     {
         return "axelar";

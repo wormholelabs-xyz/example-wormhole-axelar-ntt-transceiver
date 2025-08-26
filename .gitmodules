@@ -10,9 +10,6 @@
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
-[submodule "lib/example-native-token-transfers"]
-	path = lib/example-native-token-transfers
-	url = https://github.com/wormhole-foundation/example-native-token-transfers
 [submodule "lib/wormhole-solidity-sdk"]
 	path = lib/wormhole-solidity-sdk
 	url = https://github.com/wormhole-foundation/wormhole-solidity-sdk
@@ -25,3 +22,7 @@
 [submodule "lib/openzeppelin-foundry-upgrades"]
 	path = lib/openzeppelin-foundry-upgrades
 	url = https://github.com/OpenZeppelin/openzeppelin-foundry-upgrades
+[submodule "lib/native-token-transfers"]
+	path = lib/native-token-transfers
+	url = https://github.com/wormholelabs-xyz/native-token-transfers
+	branch = cs/generic-ntt-refactor

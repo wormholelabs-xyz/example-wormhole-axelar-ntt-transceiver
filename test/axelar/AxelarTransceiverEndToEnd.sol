@@ -47,7 +47,7 @@ contract AxelarTransceiverEndToEnd is Test {
         address sourceManagerImplementation = address(
             new NttManager(
                 address(sourceToken),
-                IManagerBase.Mode.LOCKING,
+                INttManager.Mode.LOCKING,
                 sourceChainId,
                 RATE_LIMIT_DURATION,
                 SKIP_RATE_LIMITING
@@ -71,7 +71,7 @@ contract AxelarTransceiverEndToEnd is Test {
         address recipientManagerImplementation = address(
             new NttManager(
                 address(recipientToken),
-                IManagerBase.Mode.LOCKING,
+                INttManager.Mode.LOCKING,
                 recipientChainId,
                 RATE_LIMIT_DURATION,
                 SKIP_RATE_LIMITING
