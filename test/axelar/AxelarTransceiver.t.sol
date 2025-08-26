@@ -68,6 +68,10 @@ contract AxelarTransceiverTest is Test {
         transceiver.initialize();
         vm.prank(OWNER);
         manager.setTransceiver(address(transceiver));
+        
+        manager.setReceiveTransceiverForChain(2, address(transceiver));
+        vm.prank(OWNER);
+        manager.setThreshold(2, 1);
     }
 
     function test_setAxelarChainId() public {

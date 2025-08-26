@@ -103,6 +103,17 @@ contract AxelarTransceiverEndToEnd is Test {
         vm.prank(OWNER);
         recipientNttManager.setPeer(sourceChainId, sourceNttManagerAddress, 18, 100000000);
 
+        // Configure receive transceivers and thresholds for both chains
+        vm.prank(OWNER);
+        sourceNttmanager.setReceiveTransceiverForChain(recipientChainId, address(sourceTransceiver));
+        vm.prank(OWNER);
+        sourceNttmanager.setThreshold(recipientChainId, 1);
+        
+        vm.prank(OWNER);
+        recipientNttManager.setReceiveTransceiverForChain(sourceChainId, address(recipientTransceiver));
+        vm.prank(OWNER);
+        recipientNttManager.setThreshold(sourceChainId, 1);
+
         string memory sourceChainName = "srcChain";
         string memory sourceAxelarAddress = "srcAxelar";
 
