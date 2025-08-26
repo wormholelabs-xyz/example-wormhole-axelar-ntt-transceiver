@@ -69,6 +69,7 @@ contract AxelarTransceiverTest is Test {
         vm.prank(OWNER);
         manager.setTransceiver(address(transceiver));
         
+        vm.prank(OWNER);
         manager.setReceiveTransceiverForChain(2, address(transceiver));
         vm.prank(OWNER);
         manager.setThreshold(2, 1);
