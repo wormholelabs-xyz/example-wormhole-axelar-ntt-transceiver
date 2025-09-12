@@ -53,7 +53,7 @@ contract AxelarTransceiverTest is Test {
         address managerImplementation = address(
             new NttManager(
                 address(token),
-                IManagerBase.Mode.LOCKING,
+                INttManager.Mode.LOCKING,
                 1,
                 RATE_LIMIT_DURATION,
                 SKIP_RATE_LIMITING
@@ -68,6 +68,11 @@ contract AxelarTransceiverTest is Test {
         transceiver.initialize();
         vm.prank(OWNER);
         manager.setTransceiver(address(transceiver));
+        
+        vm.prank(OWNER);
+        manager.setReceiveTransceiverForChain(2, address(transceiver));
+        vm.prank(OWNER);
+        manager.setThreshold(2, 1);
     }
 
     function test_setAxelarChainId() public {
